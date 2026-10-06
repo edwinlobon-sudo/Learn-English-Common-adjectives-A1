@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Learn English - Interactive Quiz Simulation</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-yellow: #eab308;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 520px;
+            background: #111827;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #374151;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--accent-green);
+            text-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 3px;
+        }
+
+        .badge-simulated {
+            background: var(--accent-purple);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid #4b5563;
+            color: white;
+            padding: 8px 3px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-blue);
+            border-color: #60a5fa;
+            transform: scale(1.02);
+        }
+
+        /* Activity Cards */
+        .activity-card {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #374151;
+        }
+
+        .activity-card.active {
+            display: block;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+        }
+
+        /* Inputs Grid */
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .num-item {
+            background: #0f172a;
+            padding: 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .num-badge {
+            background: var(--accent-pink);
+            color: white;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 8px;
+            min-width: 45px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            background: #1f2937;
+            color: white;
+            outline: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* Word Bank */
+        .bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .chip {
+            background: var(--accent-purple);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .paragraph-box p {
+            line-height: 1.8;
+            font-size: 0.88rem;
+            margin-bottom: 12px;
+            background: #0f172a;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        select {
+            background: #1f2937;
+            color: var(--accent-yellow);
+            border: 2px solid var(--accent-blue);
+            padding: 4px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        /* Scramble Game */
+        .scramble-group {
+            margin-bottom: 15px;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #374151;
+            transition: all 0.2s;
+        }
+
+        .clue-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .clue-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .clue-text {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            font-style: italic;
+            flex-grow: 1;
+        }
+
+        .letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 40px;
+            margin-bottom: 8px;
+        }
+
+        .draggable-letter {
+            background: #374151;
+            border: 1px solid #6b7280;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        .draggable-letter:active {
+            transform: scale(0.95);
+            background: var(--accent-blue);
+        }
+
+        .drop-zone {
+            min-height: 45px;
+            border: 2px dashed #4b5563;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px;
+            background: #1e293b;
+            transition: all 0.2s;
+        }
+
+        /* Action Controls */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            flex: 2;
+            background: var(--accent-green);
+            color: #052e16;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #15803d;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-retry {
+            flex: 1;
+            background: var(--accent-purple);
+            color: white;
+            font-weight: 800;
+            font-size: 0.9rem;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6b21a8;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            display: none;
+        }
+
+        .btn-action:active, .btn-retry:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            cursor: pointer;
+        }
+
+        /* Animation Effects */
+        .pop-correct {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.8) !important;
+            transform: scale(1.02);
+        }
+
+        .pop-incorrect {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.8) !important;
+            transform: scale(0.98);
+        }
+
+        /* Feedback Card */
+        .feedback-card {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+            border: 2px solid transparent;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .feedback-grade {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .feedback-msg {
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .grade-excelent {
+            background: #064e3b;
+            border-color: #22c55e;
+            color: #6ee7b7;
+        }
+
+        .grade-good {
+            background: #78350f;
+            border-color: #f59e0b;
+            color: #fde68a;
+        }
+
+        .grade-retry {
+            background: #7f1d1d;
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>Learn English</h1>
+        <div class="subtitle">Practice with me!</div>
+        <div class="badge-simulated">Quiz Simulation</div>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('act1', event)">1. Numbers</button>
+        <button class="tab-btn" onclick="switchTab('act2', event)">2. Stories</button>
+        <button class="tab-btn" onclick="switchTab('act3', event)">3. Actions</button>
+        <button class="tab-btn" onclick="switchTab('act4', event)">4. Scramble</button>
+    </nav>
+
+    <!-- ACTIVIDAD 1: NÚMEROS -->
+    <div id="act1" class="activity-card active">
+        <h2>1. Write the Numbers</h2>
+        <p style="font-size:0.78rem; color:#aaa; margin-bottom:10px;">Write the numbers in English letters:</p>
+        
+        <div class="number-grid">
+            <div class="num-item" id="item-num-12"><span class="num-badge">12</span><input type="text" id="num-12" placeholder="word..."></div>
+            <div class="num-item" id="item-num-22"><span class="num-badge">22</span><input type="text" id="num-22" placeholder="word..."></div>
+            <div class="num-item" id="item-num-34"><span class="num-badge">34</span><input type="text" id="num-34" placeholder="word..."></div>
+            <div class="num-item" id="item-num-45"><span class="num-badge">45</span><input type="text" id="num-45" placeholder="word..."></div>
+            <div class="num-item" id="item-num-55"><span class="num-badge">55</span><input type="text" id="num-55" placeholder="word..."></div>
+            <div class="num-item" id="item-num-75"><span class="num-badge">75</span><input type="text" id="num-75" placeholder="word..."></div>
+            <div class="num-item" id="item-num-90"><span class="num-badge">90</span><input type="text" id="num-90" placeholder="word..."></div>
+            <div class="num-item" id="item-num-100"><span class="num-badge">100</span><input type="text" id="num-100" placeholder="word..."></div>
+            <div class="num-item" id="item-num-120"><span class="num-badge">120</span><input type="text" id="num-120" placeholder="word..."></div>
+            <div class="num-item" id="item-num-1000"><span class="num-badge">1000</span><input type="text" id="num-1000" placeholder="word..."></div>
+        </div>
+
+        <div class="action-group">
+            <button class="btn-action" id="btn-send-1" onclick="checkAct1()">Send Answer</button>
+            <button class="btn-retry" id="btn-retry-1" onclick="resetAct1()">Try Again</button>
+        </div>
+        <div id="res1" class="feedback-card"></div>
+    </div>
+
+    <!-- ACTIVIDAD 2: PÁRRAFOS -->
+    <div id="act2" class="activity-card">
+        <h2>2. Complete the Stories</h2>
+        <div class="bank">
+            <span class="chip">doctor</span><span class="chip">happy</span><span class="chip">tall</span>
+            <span class="chip">teacher</span><span class="chip">tired</span><span class="chip">short</span>
+            <span class="chip">police officer</span><span class="chip">angry</span><span class="chip">strong</span>
+            <span class="chip">chef</span><span class="chip">hungry</span><span class="chip">nurse</span><span class="chip">calm</span>
+        </div>
+
+        <div class="paragraph-box">
+            <p id="p-box-1">1. My uncle is a 
+                <select id="p1_job"><option value="">?</option><option value="doctor">doctor</option><option value="teacher">teacher</option><option value="chef">chef</option></select>. 
+                He works in a hospital. He is 
+                <select id="p1_adj1"><option value="">?</option><option value="tall">tall</option><option value="short">short</option></select> 
+                and feels 
+                <select id="p1_adj2"><option value="">?</option><option value="happy">happy</option><option value="tired">tired</option></select> when helping people.
+            </p>
+            <p id="p-box-2">2. Sarah is a 
+                <select id="p2_job"><option value="">?</option><option value="doctor">doctor</option><option value="teacher">teacher</option><option value="nurse">nurse</option></select>. 
+                She is 
+                <select id="p2_adj1"><option value="">?</option><option value="short">short</option><option value="strong">strong</option></select> 
+                and feels 
+                <select id="p2_adj2"><option value="">?</option><option value="tired">tired</option><option value="angry">angry</option></select> after teaching all day.
+            </p>
+            <p id="p-box-3">3. Alex is a 
+                <select id="p3_job"><option value="">?</option><option value="police officer">police officer</option><option value="chef">chef</option></select>. 
+                He is very 
+                <select id="p3_adj1"><option value="">?</option><option value="strong">strong</option><option value="tall">tall</option></select> 
+                and feels 
+                <select id="p3_adj2"><option value="">?</option><option value="angry">angry</option><option value="calm">calm</option></select> when solving crime.
+            </p>
+            <p id="p-box-4">4. Marco is a talented 
+                <select id="p4_job"><option value="">?</option><option value="chef">chef</option><option value="nurse">nurse</option></select>. 
+                He is always 
+                <select id="p4_adj1"><option value="">?</option><option value="hungry">hungry</option><option value="tall">tall</option></select> 
+                and feels 
+                <select id="p4_adj2"><option value="">?</option><option value="happy">happy</option><option value="tired">tired</option></select> preparing food.
+            </p>
+            <p id="p-box-5">5. Clara is a patient 
+                <select id="p5_job"><option value="">?</option><option value="nurse">nurse</option><option value="teacher">teacher</option></select>. 
+                She is very 
+                <select id="p5_adj1"><option value="">?</option><option value="short">short</option><option value="strong">strong</option></select> 
+                and stays 
+                <select id="p5_adj2"><option value="">?</option><option value="calm">calm</option><option value="angry">angry</option></select> in emergency rooms.
+            </p>
+        </div>
+
+        <div class="action-group">
+            <button class="btn-action" id="btn-send-2" onclick="checkAct2()">Send Answer</button>
+            <button class="btn-retry" id="btn-retry-2" onclick="resetAct2()">Try Again</button>
+        </div>
+        <div id="res2" class="feedback-card"></div>
+    </div>
+
+    <!-- ACTIVIDAD 3: ACCIONES DE TRABAJO -->
+    <div id="act3" class="activity-card">
+        <h2>3. Work Actions</h2>
+        <p style="font-size:0.78rem; color:#aaa;">Base Actions Bank: <i>[ cure, protect, teach, help, drive, cook, paint, fix, clean, serve ]</i></p>
+
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.83rem;">
+            <div id="act-item-1">1. The doctor <input type="text" id="action1" style="width:110px;"> sick patients.</div>
+            <div id="act-item-2">2. The teacher <input type="text" id="action2" style="width:110px;"> teenagers at school.</div>
+            <div id="act-item-3">3. A police officer <input type="text" id="action3" style="width:110px;"> the town.</div>
+            <div id="act-item-4">4. The nurse <input type="text" id="action4" style="width:110px;"> sick people.</div>
+            <div id="act-item-5">5. The bus driver <input type="text" id="action5" style="width:110px;"> a big bus.</div>
+            <div id="act-item-6">6. The chef <input type="text" id="action6" style="width:110px;"> delicious meals.</div>
+            <div id="act-item-7">7. An artist <input type="text" id="action7" style="width:110px;"> beautiful pictures.</div>
+            <div id="act-item-8">8. The mechanic <input type="text" id="action8" style="width:110px;"> broken cars.</div>
+            <div id="act-item-9">9. The janitor <input type="text" id="action9" style="width:110px;"> the classrooms.</div>
+            <div id="act-item-10">10. The waiter <input type="text" id="action10" style="width:110px;"> food to clients.</div>
+        </div>
+
+        <div class="action-group">
+            <button class="btn-action" id="btn-send-3" onclick="checkAct3()">Send Answer</button>
+            <button class="btn-retry" id="btn-retry-3" onclick="resetAct3()">Try Again</button>
+        </div>
+        <div id="res3" class="feedback-card"></div>
+    </div>
+
+    <!-- ACTIVIDAD 4: UNSCRAMBLE DE PALABRAS -->
+    <div id="act4" class="activity-card">
+        <h2>4. Unscramble the Words</h2>
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">Tap the letters to place them in order:</p>
+        
+        <div id="scramble-list"></div>
+
+        <div class="action-group">
+            <button class="btn-action" id="btn-send-4" onclick="checkAct4()">Send Answer</button>
+            <button class="btn-retry" id="btn-retry-4" onclick="resetAct4()">Try Again</button>
+        </div>
+        <div id="res4" class="feedback-card"></div>
+    </div>
+</div>
+
+<script>
+    // --- SINTETIZADOR CON COMPRESOR/AMPLIFICADOR DE VOLUMEN MÁXIMO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Compresor de Dinámica: actua como un amplificador maestro
+    const masterCompressor = audioCtx.createDynamicsCompressor();
+    masterCompressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
+    masterCompressor.knee.setValueAtTime(40, audioCtx.currentTime);
+    masterCompressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+    masterCompressor.attack.setValueAtTime(0, audioCtx.currentTime);
+    masterCompressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+    masterCompressor.connect(audioCtx.destination);
+
+    function playBellDing(step) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const notes = [659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66, 1318.51, 1396.91, 1567.98];
+        let baseFreq = notes[step % notes.length];
+
+        // Oscilador 1: Onda fundamental limpia y potente
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+
+        // Oscilador 2: Armónico alto para la resonancia del timbre
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(baseFreq * 2.5, audioCtx.currentTime);
+
+        // Volumen máximo asignado
+        gain1.gain.setValueAtTime(0.95, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+        gain2.gain.setValueAtTime(0.7, audioCtx.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(masterCompressor);
+        gain2.connect(masterCompressor);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioCtx.currentTime + 0.4);
+        osc2.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function playErrorBuzz() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.85, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+        osc.connect(gain);
+        gain.connect(masterCompressor);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function playVictoryFanfare() {
+        const fanfareNotes = [523.25, 659.25, 783.99, 1046.50];
+        fanfareNotes.forEach((freq, i) => {
+            setTimeout(() => playBellDing(i + 4), i * 100);
+        });
+    }
+
+    // --- NAVEGACIÓN ---
+    function switchTab(actId, evt) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.activity-card').forEach(c => c.classList.remove('active'));
+        
+        evt.target.classList.add('active');
+        document.getElementById(actId).classList.add('active');
+    }
+
+    function normalize(text) {
+        return text.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    }
+
+    // --- ACTIVIDAD 1 (NÚMEROS) ---
+    function checkAct1() {
+        const answers = {
+            'num-12': ['twelve'],
+            'num-22': ['twenty two', 'twentytwo'],
+            'num-34': ['thirty four', 'thirtyfour'],
+            'num-45': ['forty five', 'fortyfive'],
+            'num-55': ['fifty five', 'fiftyfive'],
+            'num-75': ['seventy five', 'seventyfive'],
+            'num-90': ['ninety'],
+            'num-100': ['one hundred', 'a hundred', 'onehundred'],
+            'num-120': ['one hundred twenty', 'one hundred and twenty', 'onehundredtwenty'],
+            'num-1000': ['one thousand', 'a thousand', 'onethousand']
+        };
+
+        const keys = Object.keys(answers);
+        let hits = 0;
+        document.getElementById('btn-send-1').disabled = true;
+
+        keys.forEach((id, index) => {
+            setTimeout(() => {
+                let elInput = document.getElementById(id);
+                let elContainer = document.getElementById('item-' + id);
+                let val = normalize(elInput.value);
+
+                if (answers[id].includes(val)) {
+                    hits++;
+                    elContainer.className = 'num-item pop-correct';
+                    playBellDing(hits);
+                } else {
+                    elContainer.className = 'num-item pop-incorrect';
+                    playErrorBuzz();
+                }
+
+                if (index === keys.length - 1) {
+                    showFeedback('res1', 'btn-retry-1', hits, keys.length);
+                    document.getElementById('btn-send-1').disabled = false;
+                }
+            }, index * 250);
+        });
+    }
+
+    function resetAct1() {
+        document.querySelectorAll('#act1 input').forEach(i => i.value = '');
+        document.querySelectorAll('#act1 .num-item').forEach(c => c.className = 'num-item');
+        document.getElementById('res1').style.display = 'none';
+        document.getElementById('btn-retry-1').style.display = 'none';
+    }
+
+    // --- ACTIVIDAD 2 (HISTORIAS) ---
+    function checkAct2() {
+        const fields = [
+            { id: 'p1_job', correct: 'doctor' }, { id: 'p1_adj1', correct: 'tall' }, { id: 'p1_adj2', correct: 'happy' },
+            { id: 'p2_job', correct: 'teacher' }, { id: 'p2_adj1', correct: 'short' }, { id: 'p2_adj2', correct: 'tired' },
+            { id: 'p3_job', correct: 'police officer' }, { id: 'p3_adj1', correct: 'strong' }, { id: 'p3_adj2', correct: 'angry' },
+            { id: 'p4_job', correct: 'chef' }, { id: 'p4_adj1', correct: 'hungry' }, { id: 'p4_adj2', correct: 'happy' },
+            { id: 'p5_job', correct: 'nurse' }, { id: 'p5_adj1', correct: 'short' }, { id: 'p5_adj2', correct: 'calm' }
+        ];
+
+        let hits = 0;
+        document.getElementById('btn-send-2').disabled = true;
+
+        fields.forEach((item, index) => {
+            setTimeout(() => {
+                let el = document.getElementById(item.id);
+                if (el.value === item.correct) {
+                    hits++;
+                    el.style.borderColor = '#22c55e';
+                    el.style.backgroundColor = '#064e3b';
+                    playBellDing(hits);
+                } else {
+                    el.style.borderColor = '#ef4444';
+                    el.style.backgroundColor = '#7f1d1d';
+                    playErrorBuzz();
+                }
+
+                if (index === fields.length - 1) {
+                    showFeedback('res2', 'btn-retry-2', hits, fields.length);
+                    document.getElementById('btn-send-2').disabled = false;
+                }
+            }, index * 200);
+        });
+    }
+
+    function resetAct2() {
+        document.querySelectorAll('#act2 select').forEach(s => {
+            s.value = '';
+            s.style.borderColor = 'var(--accent-blue)';
+            s.style.backgroundColor = '#1f2937';
+        });
+        document.getElementById('res2').style.display = 'none';
+        document.getElementById('btn-retry-2').style.display = 'none';
+    }
+
+    // --- ACTIVIDAD 3 (ACCIONES DE TRABAJO) ---
+    function checkAct3() {
+        const correct = {
+            'action1': ['cures', 'cure'], 'action2': ['teaches', 'teach'],
+            'action3': ['protects', 'protect'], 'action4': ['helps', 'help'],
+            'action5': ['drives', 'drive'], 'action6': ['cooks', 'cook'],
+            'action7': ['paints', 'paint'], 'action8': ['fixes', 'fix'],
+            'action9': ['cleans', 'clean'], 'action10': ['serves', 'serve']
+        };
+
+        const keys = Object.keys(correct);
+        let hits = 0;
+        document.getElementById('btn-send-3').disabled = true;
+
+        keys.forEach((id, index) => {
+            setTimeout(() => {
+                let input = document.getElementById(id);
+                let val = normalize(input.value);
+
+                if (correct[id].includes(val)) {
+                    hits++;
+                    input.style.borderColor = '#22c55e';
+                    input.className = 'pop-correct';
+                    playBellDing(hits);
+                } else {
+                    input.style.borderColor = '#ef4444';
+                    input.className = 'pop-incorrect';
+                    playErrorBuzz();
+                }
+
+                if (index === keys.length - 1) {
+                    showFeedback('res3', 'btn-retry-3', hits, keys.length);
+                    document.getElementById('btn-send-3').disabled = false;
+                }
+            }, index * 250);
+        });
+    }
+
+    function resetAct3() {
+        document.querySelectorAll('#act3 input').forEach(i => {
+            i.value = '';
+            i.style.borderColor = '#4b5563';
+            i.className = '';
+        });
+        document.getElementById('res3').style.display = 'none';
+        document.getElementById('btn-retry-3').style.display = 'none';
+    }
+
+    // --- ACTIVIDAD 4 (SCRAMBLE) ---
+    const scrambleData = [
+        { 
+            id: 1, word: 'NERVOUS', clue: 'Emotion: Feeling worried before an exam.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>` 
+        },
+        { 
+            id: 2, word: 'GREEN', clue: 'Color: The color of grass and leaves.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.4 19 2c1 2 2 4.1 2 9a9 9 0 0 1-10 9Z"/><path d="M11 20v-5"/></svg>` 
+        },
+        { 
+            id: 3, word: 'YELLOW', clue: 'Color: The color of the bright sun.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>` 
+        },
+        { 
+            id: 4, word: 'RED', clue: 'Color: The color of passion and hearts.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>` 
+        },
+        { 
+            id: 5, word: 'TEACHER', clue: 'Occupation: Educates students in school.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` 
+        },
+        { 
+            id: 6, word: 'POLICE', clue: 'Occupation: Protects city citizens.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>` 
+        },
+        { 
+            id: 7, word: 'FRIENDLY', clue: 'Personality: A nice person with many friends.',
+            icon: `<svg class="clue-icon" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>` 
+        }
+    ];
+
+    function renderScrambleGame() {
+        const listContainer = document.getElementById('scramble-list');
+        listContainer.innerHTML = '';
+
+        scrambleData.forEach(item => {
+            let group = document.createElement('div');
+            group.className = 'scramble-group';
+            group.id = `scramble-group-${item.id}`;
+
+            let clueHeader = document.createElement('div');
+            clueHeader.className = 'clue-header';
+            clueHeader.innerHTML = `${item.icon}<div class="clue-text">${item.id}. ${item.clue}</div>`;
+
+            let resetBtn = document.createElement('button');
+            resetBtn.className = 'btn-reset';
+            resetBtn.innerText = 'Reset';
+            resetBtn.onclick = () => resetWord(item.id);
+            clueHeader.appendChild(resetBtn);
+
+            let lettersDiv = document.createElement('div');
+            lettersDiv.className = 'letters-container';
+            lettersDiv.id = `letters-box-${item.id}`;
+
+            let dropZone = document.createElement('div');
+            dropZone.className = 'drop-zone';
+            dropZone.id = `drop-zone-${item.id}`;
+
+            let shuffled = item.word.split('').sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(char => {
+                let btn = document.createElement('div');
+                btn.className = 'draggable-letter';
+                btn.innerText = char;
+                btn.onclick = () => {
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    if (btn.parentElement === lettersDiv) {
+                        dropZone.appendChild(btn);
+                    } else {
+                        lettersDiv.appendChild(btn);
+                    }
+                };
+                lettersDiv.appendChild(btn);
+            });
+
+            group.appendChild(clueHeader);
+            group.appendChild(lettersDiv);
+            group.appendChild(dropZone);
+            listContainer.appendChild(group);
+        });
+    }
+
+    function resetWord(id) {
+        const lettersBox = document.getElementById(`letters-box-${id}`);
+        const dropZone = document.getElementById(`drop-zone-${id}`);
+        while (dropZone.firstChild) {
+            lettersBox.appendChild(dropZone.firstChild);
+        }
+        document.getElementById(`scramble-group-${id}`).className = 'scramble-group';
+    }
+
+    function checkAct4() {
+        let hits = 0;
+        document.getElementById('btn-send-4').disabled = true;
+
+        scrambleData.forEach((item, index) => {
+            setTimeout(() => {
+                const group = document.getElementById(`scramble-group-${item.id}`);
+                const dropZone = document.getElementById(`drop-zone-${item.id}`);
+                let constructed = Array.from(dropZone.children).map(c => c.innerText).join('');
+
+                if (constructed === item.word) {
+                    hits++;
+                    group.className = 'scramble-group pop-correct';
+                    playBellDing(hits);
+                } else {
+                    group.className = 'scramble-group pop-incorrect';
+                    playErrorBuzz();
+                }
+
+                if (index === scrambleData.length - 1) {
+                    showFeedback('res4', 'btn-retry-4', hits, scrambleData.length);
+                    document.getElementById('btn-send-4').disabled = false;
+                }
+            }, index * 250);
+        });
+    }
+
+    function resetAct4() {
+        scrambleData.forEach(item => resetWord(item.id));
+        document.getElementById('res4').style.display = 'none';
+        document.getElementById('btn-retry-4').style.display = 'none';
+    }
+
+    // --- CAJA DE FEEDBACK Y NOTAS DE EVALUACIÓN ---
+    function showFeedback(resId, retryBtnId, hits, total) {
+        const box = document.getElementById(resId);
+        const retryBtn = document.getElementById(retryBtnId);
+
+        let percentage = Math.round((hits / total) * 100);
+        box.style.display = 'block';
+        retryBtn.style.display = 'block';
+
+        let gradeTitle = '';
+        let feedbackMessage = '';
+
+        if (percentage === 100) {
+            playVictoryFanfare();
+            box.className = 'feedback-card grade-excelent';
+            gradeTitle = `Grade: ${percentage}% (A+) - Excellent!`;
+            feedbackMessage = `Outstanding job! You mastered all the words perfectly. Keep up the amazing work! 🎉`;
+        } else if (percentage >= 70) {
+            box.className = 'feedback-card grade-good';
+            gradeTitle = `Grade: ${percentage}% - Great Job!`;
+            feedbackMessage = `Very good effort! You got ${hits} out of ${total} correct. Review the missed items and tap "Try Again" to get 100%! 👍`;
+        } else {
+            box.className = 'feedback-card grade-retry';
+            gradeTitle = `Grade: ${percentage}% - Good Try!`;
+            feedbackMessage = `You got ${hits} out of ${total} correct. Don't worry, practice makes perfect! Tap "Try Again" to improve your score. 💪`;
+        }
+
+        box.innerHTML = `
+            <div class="feedback-grade">${gradeTitle}</div>
+            <div class="feedback-msg">${feedbackMessage}</div>
+        `;
+    }
+
+    window.onload = renderScrambleGame;
+</script>
+</body>
+</html>
